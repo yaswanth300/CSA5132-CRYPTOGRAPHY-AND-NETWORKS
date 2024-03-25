@@ -1,0 +1,44 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+#define ALPHABET_SIZE 26
+
+
+int modInverse(int a, int m) {
+    a = a % m;
+    for (int x = 1; x < m; x++)
+        if ((a * x) % m == 1)
+            return x;
+    return -1;
+}
+
+
+void breakAffineCipher(char *ciphertext, char mostFrequent, char secondMostFrequent) {
+   
+    int mostFrequentIndex = mostFrequent - 'A';
+    int secondMostFrequentIndex = secondMostFrequent - 'A';
+    int mostFrequentLetter = 'E' - 'A';
+    int secondMostFrequentLetter = 'T' - 'A';
+
+    
+    int a = (secondMostFrequentLetter - mostFrequentLetter) * modInverse(secondMostFrequentIndex - mostFrequentIndex, ALPHABET_SIZE) % ALPHABET_SIZE;
+
+    
+    int b = (mostFrequentLetter - a * mostFrequentIndex) % ALPHABET_SIZE;
+    if (b < 0)
+        b += ALPHABET_SIZE;
+
+    printf("The affine cipher key is: a = %d, b = %d\n", a, b);
+}
+
+int main() {
+    char ciphertext[] = "BUBUBUBUBUBU"; 
+
+    char mostFrequent = 'B'; 
+    char secondMostFrequent = 'U'; 
+
+    breakAffineCipher(ciphertext, mostFrequent, secondMostFrequent);
+
+    return 0;
+}
