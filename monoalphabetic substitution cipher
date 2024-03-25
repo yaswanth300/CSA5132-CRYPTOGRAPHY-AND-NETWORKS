@@ -1,0 +1,52 @@
+#include <stdio.h>
+#include <ctype.h>
+#include <string.h>
+
+void encrypt(char *text, char *cipher) {
+    while (*text != '\0') {
+        if (isalpha(*text)) {
+            char base = islower(*text) ? 'a' : 'A';
+            *text = cipher[*text - base];
+        }
+        text++;
+    }
+}
+
+void decrypt(char *text, char *cipher) {
+    while (*text != '\0') {
+        if (isalpha(*text)) {
+            char base = islower(*text) ? 'a' : 'A';
+            for (int i = 0; i < 26; i++) {
+                if (cipher[i] == *text) {
+                    *text = i + base;
+                    break;
+                }
+            }
+        }
+        text++;
+    }
+}
+
+int main() {
+    char text[100], cipher[26];
+    int i;
+
+    
+    printf("Enter the substitution cipher alphabet (26 letters): ");
+    for (i = 0; i < 26; i++) {
+        scanf(" %c", &cipher[i]);
+    }
+
+    
+    printf("Enter text: ");
+    scanf(" %[^\n]", text);
+
+    
+    encrypt(text, cipher);
+    printf("Encrypted text: %s\n", text);
+
+    decrypt(text, cipher);
+    printf("Decrypted text: %s\n", text);
+
+    return 0;
+}
