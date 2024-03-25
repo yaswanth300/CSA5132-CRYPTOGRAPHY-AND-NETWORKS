@@ -1,0 +1,60 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+#define ALPHABET_SIZE 26
+
+// Function to generate the cipher sequence using a keyword
+void generateCipherSequence(char *keyword, char *cipherSequence) {
+    int keywordLen = strlen(keyword);
+    int index = 0;
+
+    // Copy the keyword to the beginning of the cipher sequence
+    strcpy(cipherSequence, keyword);
+
+    // Mark the characters used in the keyword
+    int used[ALPHABET_SIZE] = {0};
+    for (int i = 0; i < keywordLen; i++) {
+        char c = tolower(keyword[i]);
+        if (isalpha(c) && !used[c - 'a']) {
+            used[c - 'a'] = 1;
+        }
+    }
+
+    // Fill the remaining characters in the cipher sequence
+    for (char c = 'a'; c <= 'z'; c++) {
+        if (!used[c - 'a']) {
+            cipherSequence[keywordLen + index] = c;
+            index++;
+        }
+    }
+    cipherSequence[keywordLen + index] = '\0';
+}
+
+// Function to encrypt the plaintext using the generated cipher sequence
+void encrypt(char *plaintext, char *cipherSequence) {
+    for (int i = 0; plaintext[i] != '\0'; i++) {
+        if (isalpha(plaintext[i])) {
+            char base = islower(plaintext[i]) ? 'a' : 'A';
+            int index = tolower(plaintext[i]) - 'a';
+            plaintext[i] = cipherSequence[index] - 'a' + base;
+        }
+    }
+}
+
+int main() {
+    char keyword[] = "CIPHER";
+    char plaintext[] = "abcdefghijklmnopqrstuvwxyz";
+    char cipherSequence[ALPHABET_SIZE + 1];
+
+    // Generate the cipher sequence using the keyword
+    generateCipherSequence(keyword, cipherSequence);
+
+    // Encrypt the plaintext using the generated cipher sequence
+    encrypt(plaintext, cipherSequence);
+
+    // Print the encrypted text
+    printf("Encrypted text: %s\n", plaintext);
+
+    return 0;
+}
