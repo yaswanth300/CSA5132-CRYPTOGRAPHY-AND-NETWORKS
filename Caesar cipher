@@ -1,0 +1,31 @@
+#include <stdio.h>
+#include <ctype.h>
+
+void encrypt_decrypt(char *text, int key, int mode) {
+    while (*text != '\0') {
+        if (isalpha(*text)) {
+            char base = islower(*text) ? 'a' : 'A';
+            *text = ((*text - base + (mode * key) + 26) % 26) + base;
+        }
+        text++;
+    }
+}
+
+int main() {
+    char text[100];
+    int key;
+
+    printf("Enter text: ");
+    fgets(text, sizeof(text), stdin);
+
+    printf("Enter key (1-25): ");
+    scanf("%d", &key);
+
+    encrypt_decrypt(text, key, 1);
+    printf("Encrypted text: %s\n", text);
+
+    encrypt_decrypt(text, key, -1);
+    printf("Decrypted text: %s\n", text);
+
+    return 0;
+}
