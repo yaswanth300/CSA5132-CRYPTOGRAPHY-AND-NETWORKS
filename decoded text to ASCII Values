@@ -1,0 +1,61 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+#define ALPHABET_SIZE 26
+
+// Function to calculate the frequency of each character in the ciphertext
+void calculateFrequency(char *ciphertext, int *frequency) {
+    for (int i = 0; ciphertext[i] != '\0'; i++) {
+        if (isalpha(ciphertext[i])) {
+            int index = tolower(ciphertext[i]) - 'a';
+            frequency[index]++;
+        }
+    }
+}
+
+// Function to find the most frequent character in the ciphertext
+char findMostFrequent(int *frequency) {
+    int maxFreq = 0;
+    char mostFrequentChar;
+    for (int i = 0; i < ALPHABET_SIZE; i++) {
+        if (frequency[i] > maxFreq) {
+            maxFreq = frequency[i];
+            mostFrequentChar = 'a' + i;
+        }
+    }
+    return mostFrequentChar;
+}
+
+// Function to decode the ciphertext using frequency analysis
+void decodeCiphertext(char *ciphertext) {
+    int frequency[ALPHABET_SIZE] = {0};
+    calculateFrequency(ciphertext, frequency);
+    char mostFrequentChar = findMostFrequent(frequency);
+
+    // Calculate the offset between the most frequent character in the ciphertext and 'e' (the most frequent letter in English)
+    int offset = mostFrequentChar - 'e';
+
+    // Decode the ciphertext by shifting characters by the offset
+    for (int i = 0; ciphertext[i] != '\0'; i++) {
+        if (isalpha(ciphertext[i])) {
+            ciphertext[i] -= offset;
+            if (ciphertext[i] < 'a')
+                ciphertext[i] += ALPHABET_SIZE;
+        }
+    }
+}
+
+int main() {
+    char ciphertext[] = "53‡‡†305))6*;4826)4‡.)4‡);806*;48†8¶60))85;;]8*;:‡*8†83 (88)5*†;46(;88*96*?;8)*‡(;485);5*†2:*‡(;4956*2(5*—4)8¶8* ;4069285);)6†8)4‡‡;1(‡9;48081;8:8‡1;48†85;4)485†528806*81 (‡9;48;(88;4(‡?34;48)4‡;161;:188;‡?";
+    
+    decodeCiphertext(ciphertext);
+    printf("Decoded text (ASCII values): ");
+    for (int i = 0; ciphertext[i] != '\0'; i++) {
+        printf("%d ", ciphertext[i]);
+    }
+    printf("\n");
+
+    return 0;
+}
