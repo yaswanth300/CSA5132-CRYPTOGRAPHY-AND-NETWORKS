@@ -1,0 +1,61 @@
+#include <stdio.h>
+#include <ctype.h>
+#include <string.h> // Include string.h for strcpy function
+
+#define ALPHABET_SIZE 26
+
+int modInverse(int a, int m) {
+    a = a % m;
+    for (int x = 1; x < m; x++)
+        if ((a * x) % m == 1)
+            return x;
+    return -1;
+}
+
+void affineCipherEncrypt(char *plaintext, int a, int b) {
+    for (int i = 0; plaintext[i] != '\0'; i++) {
+        if (isalpha(plaintext[i])) {
+            char base = islower(plaintext[i]) ? 'a' : 'A';
+            plaintext[i] = ((a * (tolower(plaintext[i]) - base) + b) % ALPHABET_SIZE) + base;
+        }
+    }
+}
+
+void affineCipherDecrypt(char *ciphertext, int a, int b) {
+    int aInverse = modInverse(a, ALPHABET_SIZE);
+    for (int i = 0; ciphertext[i] != '\0'; i++) {
+        if (isalpha(ciphertext[i])) {
+            char base = islower(ciphertext[i]) ? 'a' : 'A';
+            int decryptedChar = aInverse * (tolower(ciphertext[i]) - base - b);
+            while (decryptedChar < 0)
+                decryptedChar += ALPHABET_SIZE;
+            ciphertext[i] = (decryptedChar % ALPHABET_SIZE) + base;
+        }
+    }
+}
+
+
+int main() {
+    char plaintext[100], ciphertext[100];
+    int a, b;
+
+    printf("Enter plaintext: ");
+    fgets(plaintext, sizeof(plaintext), stdin);
+
+    printf("Enter the value of 'a' (must be coprime with 26): ");
+    scanf("%d", &a);
+
+    printf("Enter the value of 'b': ");
+    scanf("%d", &b);
+
+    // Encrypt plaintext
+    strcpy(ciphertext, plaintext); // Include string.h for strcpy function
+    affineCipherEncrypt(ciphertext, a, b);
+    printf("Encrypted text: %s\n", ciphertext);
+
+    // Decrypt ciphertext
+    affineCipherDecrypt(ciphertext, a, b);
+    printf("Decrypted text: %s\n", ciphertext);
+
+    return 0;
+}
