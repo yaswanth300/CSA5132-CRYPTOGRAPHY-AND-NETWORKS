@@ -1,0 +1,43 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+#define ALPHABET_SIZE 26
+
+// Function to generate a monoalphabetic cipher sequence using a keyword
+void generateCipherSequence(char *keyword, char *cipherSequence) {
+    int keywordLength = strlen(keyword);
+    int used[ALPHABET_SIZE] = {0};
+
+    // Initialize cipher sequence with the keyword
+    strcpy(cipherSequence, keyword);
+
+    // Mark letters used in the keyword
+    for (int i = 0; i < keywordLength; i++) {
+        if (isalpha(keyword[i])) {
+            used[tolower(keyword[i]) - 'a'] = 1;
+        }
+    }
+
+    // Append remaining unused letters to the cipher sequence
+    int j = keywordLength;
+    for (int i = 0; i < ALPHABET_SIZE; i++) {
+        if (!used[i]) {
+            cipherSequence[j++] = 'a' + i;
+        }
+    }
+    cipherSequence[j] = '\0';
+}
+
+int main() {
+    char keyword[] = "CIPHER";
+    char cipherSequence[ALPHABET_SIZE + 1];
+
+    // Generate the monoalphabetic cipher sequence using the keyword
+    generateCipherSequence(keyword, cipherSequence);
+
+    // Print the generated cipher sequence
+    printf("Monoalphabetic cipher sequence:\n%s\n", cipherSequence);
+
+    return 0;
+}
