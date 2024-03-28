@@ -1,0 +1,85 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MOD 26
+
+// Function to calculate the modular multiplicative inverse of a number
+int modInverse(int a, int m) {
+    a = a % m;
+    for (int x = 1; x < m; x++)
+        if ((a * x) % m == 1)
+            return x;
+    return -1;
+}
+
+// Function to calculate the determinant of a 2x2 matrix
+int determinant(int a, int b, int c, int d) {
+    return a * d - b * c;
+}
+
+// Function to calculate the inverse of a 2x2 matrix
+void inverseMatrix(int a, int b, int c, int d, int *a_inv, int *b_inv, int *c_inv, int *d_inv) {
+    int det = determinant(a, b, c, d);
+    int inv_det = modInverse(det, MOD);
+    *a_inv = (d * inv_det) % MOD;
+    *b_inv = (-b * inv_det) % MOD;
+    *c_inv = (-c * inv_det) % MOD;
+    *d_inv = (a * inv_det) % MOD;
+
+    // Make sure the inverse is within the range [0, MOD)
+    if (*a_inv < 0)
+        *a_inv += MOD;
+    if (*b_inv < 0)
+        *b_inv += MOD;
+    if (*c_inv < 0)
+        *c_inv += MOD;
+    if (*d_inv < 0)
+        *d_inv += MOD;
+}
+
+// Function to perform Hill cipher encryption
+void hillEncrypt(int plaintext[], int key[][2], int ciphertext[], int len) {
+    for (int i = 0; i < len; i += 2) {
+        ciphertext[i] = (key[0][0] * plaintext[i] + key[0][1] * plaintext[i + 1]) % MOD;
+        ciphertext[i + 1] = (key[1][0] * plaintext[i] + key[1][1] * plaintext[i + 1]) % MOD;
+    }
+}
+
+// Function to perform Hill cipher decryption
+void hillDecrypt(int ciphertext[], int key[][2], int plaintext[], int len) {
+    int a_inv, b_inv, c_inv, d_inv;
+    inverseMatrix(key[0][0], key[0][1], key[1][0], key[1][1], &a_inv, &b_inv, &c_inv, &d_inv);
+
+    for (int i = 0; i < len; i += 2) {
+        plaintext[i] = (a_inv * ciphertext[i] + b_inv * ciphertext[i + 1]) % MOD;
+        plaintext[i + 1] = (c_inv * ciphertext[i] + d_inv * ciphertext[i + 1]) % MOD;
+    }
+}
+
+// Function to print the plaintext or ciphertext
+void printArray(int arr[], int len) {
+    for (int i = 0; i < len; i++) {
+        printf("%c ", 'A' + arr[i]);
+    }
+    printf("\n");
+}
+
+int main() {
+    int plaintext[] = {0, 12, 24, 2}; // Plaintext: A, M, Y, C
+    int key[][2] = {{3, 2}, {5, 7}};  // Key matrix
+    int len = sizeof(plaintext) / sizeof(plaintext[0]);
+    int ciphertext[len];
+
+    // Encrypt the plaintext
+    hillEncrypt(plaintext, key, ciphertext, len);
+    printf("Ciphertext: ");
+    printArray(ciphertext, len);
+
+    // Decrypt the ciphertext
+    int decrypted[len];
+    hillDecrypt(ciphertext, key, decrypted, len);
+    printf("Decrypted text: ");
+    printArray(decrypted, len);
+
+    return 0;
+}
