@@ -1,0 +1,67 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+
+// Function to encrypt a single character using the affine Caesar cipher
+char encrypt(char ch, int a, int b) {
+    if (isalpha(ch)) {
+        int offset = islower(ch) ? 'a' : 'A';
+        return ((a * (ch - offset) + b) % 26) + offset;
+    }
+    return ch;
+}
+
+// Function to decrypt a single character using the affine Caesar cipher
+char decrypt(char ch, int a, int b) {
+    if (isalpha(ch)) {
+        int offset = islower(ch) ? 'a' : 'A';
+        // Calculate the modular multiplicative inverse of 'a' modulo 26
+        int inv_a = 0;
+        while ((a * inv_a) % 26 != 1) {
+            inv_a++;
+        }
+        return ((inv_a * ((ch - offset) - b + 26)) % 26) + offset;
+    }
+    return ch;
+}
+
+// Function to encrypt a string using the affine Caesar cipher
+void encryptString(char *plaintext, char *ciphertext, int a, int b) {
+    int i = 0;
+    while (plaintext[i] != '\0') {
+        ciphertext[i] = encrypt(plaintext[i], a, b);
+        i++;
+    }
+    ciphertext[i] = '\0';
+}
+
+// Function to decrypt a string using the affine Caesar cipher
+void decryptString(char *ciphertext, char *plaintext, int a, int b) {
+    int i = 0;
+    while (ciphertext[i] != '\0') {
+        plaintext[i] = decrypt(ciphertext[i], a, b);
+        i++;
+    }
+    plaintext[i] = '\0';
+}
+
+int main() {
+    char plaintext[100];
+    char ciphertext[100];
+    int a = 3; // Multiplicative key
+    int b = 5; // Additive key
+
+    // Read plaintext from the user
+    printf("Enter plaintext: ");
+    fgets(plaintext, sizeof(plaintext), stdin);
+
+    // Encrypt plaintext
+    encryptString(plaintext, ciphertext, a, b);
+    printf("Encrypted text: %s\n", ciphertext);
+
+    // Decrypt ciphertext
+    decryptString(ciphertext, plaintext, a, b);
+    printf("Decrypted text: %s\n", plaintext);
+
+    return 0;
+}
