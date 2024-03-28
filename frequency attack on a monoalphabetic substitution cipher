@@ -1,0 +1,66 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+#define ALPHABET_SIZE 26
+
+// Function to calculate letter frequencies in the ciphertext
+void calculateFrequencies(char *ciphertext, int frequencies[]) {
+    for (int i = 0; i < strlen(ciphertext); i++) {
+        if (isalpha(ciphertext[i])) {
+            int index = tolower(ciphertext[i]) - 'a';
+            frequencies[index]++;
+        }
+    }
+}
+
+// Function to print the top N likely plaintexts based on letter frequencies
+void printTopPlaintexts(char *ciphertext, int topN) {
+    int frequencies[ALPHABET_SIZE] = {0};
+    calculateFrequencies(ciphertext, frequencies);
+
+    // Find the most frequent letter in the ciphertext
+    int maxFrequency = 0;
+    for (int i = 0; i < ALPHABET_SIZE; i++) {
+        if (frequencies[i] > maxFrequency) {
+            maxFrequency = frequencies[i];
+        }
+    }
+
+    // Guess the most likely plaintexts
+    printf("Top %d possible plaintexts:\n", topN);
+    for (int n = 1; n <= topN; n++) {
+        printf("Plaintext %d: ", n);
+        for (int i = 0; i < strlen(ciphertext); i++) {
+            if (isalpha(ciphertext[i])) {
+                int shift = (ciphertext[i] - 'a' - (maxFrequency - n) + ALPHABET_SIZE) % ALPHABET_SIZE;
+                printf("%c", 'a' + shift);
+            } else {
+                printf("%c", ciphertext[i]);
+            }
+        }
+        printf("\n");
+    }
+}
+
+int main() {
+    char ciphertext[1000];
+    int topN;
+
+    // Read the ciphertext from the user
+    printf("Enter the ciphertext: ");
+    fgets(ciphertext, sizeof(ciphertext), stdin);
+
+    // Remove the newline character if present
+    ciphertext[strcspn(ciphertext, "\n")] = '\0';
+
+    // Read the number of top plaintexts to display from the user
+    printf("Enter the number of top plaintexts to display: ");
+    scanf("%d", &topN);
+
+    // Print the top N possible plaintexts
+    printTopPlaintexts(ciphertext, topN);
+
+    return 0;
+}
