@@ -1,0 +1,52 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <openssl/des.h>
+
+// Function to handle errors
+void handleErrors(void) {
+    perror("Error");
+    exit(EXIT_FAILURE);
+}
+
+// Function to perform DES encryption
+void des_encrypt(unsigned char *plaintext, unsigned char *key, int mode) {
+    DES_cblock des_key;
+    DES_key_schedule des_key_schedule;
+    DES_set_key_checked(&des_key, &des_key_schedule);
+
+    unsigned char iv[8] = {0}; // Initialization vector (for CBC mode)
+    unsigned char ciphertext[8];
+
+    if (mode == DES_ENCRYPT)
+        DES_ecb_encrypt((const_DES_cblock *)plaintext, (DES_cblock *)ciphertext, &des_key_schedule, mode);
+    else if (mode == DES_CBC_ENCRYPT)
+        DES_ncbc_encrypt(plaintext, ciphertext, sizeof(plaintext), &des_key_schedule, &iv, mode);
+    else if (mode == DES_CFB_ENCRYPT)
+        DES_cfb_encrypt(plaintext, ciphertext, 8, sizeof(plaintext), &des_key_schedule, &iv, mode);
+
+    printf("Ciphertext: ");
+    for (int i = 0; i < sizeof(ciphertext); i++) {
+        printf("%02X ", ciphertext[i]);
+    }
+    printf("\n");
+}
+
+int main() {
+    unsigned char plaintext[16] = "Hello, world!!!!!"; // 16 bytes plaintext
+    unsigned char key[8] = {0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF}; // 56-bit key
+
+    // ECB Mode
+    printf("ECB Mode:\n");
+    des_encrypt(plaintext, key, DES_ENCRYPT);
+
+    // CBC Mode
+    printf("\nCBC Mode:\n");
+    des_encrypt(plaintext, key, DES_CBC_ENCRYPT);
+
+    // CFB Mode
+    printf("\nCFB Mode:\n");
+    des_encrypt(plaintext, key, DES_CFB_ENCRYPT);
+
+    return 0;
+}
