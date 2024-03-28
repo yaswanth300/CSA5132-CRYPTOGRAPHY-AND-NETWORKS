@@ -1,0 +1,62 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <openssl/dsa.h>
+#include <openssl/err.h>
+
+// Function to handle errors
+void handleErrors(void) {
+    ERR_print_errors_fp(stderr);
+    abort();
+}
+
+int main() {
+    // Initialize DSA parameters
+    DSA *dsa = NULL;
+    int bits = 1024;
+    unsigned char *message = (unsigned char *)"Hello, world!";
+    int message_len = strlen((const char *)message);
+
+    // Generate DSA parameters
+    dsa = DSA_generate_parameters(bits, NULL, 0, NULL, NULL, NULL, NULL);
+    if (dsa == NULL) {
+        handleErrors();
+    }
+
+    // Generate DSA key pair
+    if (DSA_generate_key(dsa) != 1) {
+        handleErrors();
+    }
+
+    // Sign the message
+    unsigned char signature1[DSA_size(dsa)];
+    unsigned int signature1_len;
+    if (DSA_sign(0, message, message_len, signature1, &signature1_len, dsa) != 1) {
+        handleErrors();
+    }
+
+    // Sign the same message again
+    unsigned char signature2[DSA_size(dsa)];
+    unsigned int signature2_len;
+    if (DSA_sign(0, message, message_len, signature2, &signature2_len, dsa) != 1) {
+        handleErrors();
+    }
+
+    // Verify the signatures
+    if (DSA_verify(0, message, message_len, signature1, signature1_len, dsa) != 1) {
+        printf("Signature 1 verification failed\n");
+    } else {
+        printf("Signature 1 verified successfully\n");
+    }
+
+    if (DSA_verify(0, message, message_len, signature2, signature2_len, dsa) != 1) {
+        printf("Signature 2 verification failed\n");
+    } else {
+        printf("Signature 2 verified successfully\n");
+    }
+
+    // Free resources
+    DSA_free(dsa);
+
+    return 0;
+}
