@@ -1,0 +1,42 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <openssl/des.h>
+
+// Function to handle errors
+void handleErrors(void) {
+    perror("Error");
+    exit(EXIT_FAILURE);
+}
+
+int main() {
+    // Define key and data
+    unsigned char key[8] = {0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF}; // 56-bit key
+    unsigned char plaintext[] = "Hello123"; // 64-bit plaintext
+
+    // Initialize DES key schedule
+    DES_key_schedule des_key;
+    if (DES_set_key_checked(&key, &des_key) != 0) {
+        handleErrors();
+    }
+
+    // Encrypt plaintext
+    unsigned char ciphertext[8]; // 64-bit ciphertext
+    DES_ecb_encrypt((const unsigned char *)plaintext, ciphertext, &des_key, DES_ENCRYPT);
+
+    // Print ciphertext
+    printf("Ciphertext: ");
+    for (int i = 0; i < sizeof(ciphertext); i++) {
+        printf("%02X ", ciphertext[i]);
+    }
+    printf("\n");
+
+    // Decrypt ciphertext
+    unsigned char decrypted[8]; // 64-bit decrypted text
+    DES_ecb_encrypt(ciphertext, decrypted, &des_key, DES_DECRYPT);
+
+    // Print decrypted text
+    printf("Decrypted text: %s\n", decrypted);
+
+    return 0;
+}
