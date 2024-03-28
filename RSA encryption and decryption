@@ -1,0 +1,46 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+// Function to calculate power modulo m (base^exp % m)
+long long power(long long base, long long exp, long long m) {
+    if (exp == 0)
+        return 1;
+    long long half = power(base, exp / 2, m) % m;
+    if (exp % 2 == 0)
+        return (half * half) % m;
+    else
+        return (base * half * half) % m;
+}
+
+// Function to encrypt a message using public key (e, n)
+long long encrypt(long long message, long long e, long long n) {
+    return power(message, e, n);
+}
+
+// Function to decrypt a ciphertext using private key (d, n)
+long long decrypt(long long ciphertext, long long d, long long n) {
+    return power(ciphertext, d, n);
+}
+
+int main() {
+    // Alice's public key (e, n)
+    long long e = 7; // public exponent
+    long long n = 143; // modulus
+
+    // Bob's private key (d, n)
+    long long d = 103; // private exponent
+
+    // Message to be encrypted
+    long long message = 85;
+
+    // Encrypt the message
+    long long ciphertext = encrypt(message, e, n);
+    printf("Encrypted message: %lld\n", ciphertext);
+
+    // Decrypt the ciphertext
+    long long decrypted_message = decrypt(ciphertext, d, n);
+    printf("Decrypted message: %lld\n", decrypted_message);
+
+    return 0;
+}
